@@ -10,10 +10,10 @@
     # see what you're commiting when editing the commit message
     ci = commit --verbose
 
-    d = diff --color=always
-    wd = diff --color=always --word-diff=color   # mnemonic: Word-Diff
+    d = diff
+    wd = diff --word-diff=color   # mnemonic: Word-Diff
 
-    g3 = grep --color=always --line-number --context 3
+    g3 = grep --line-number --context 3
 
     please = push --force-with-lease   # never use plain --force!
     # unlike plain `pull`, this won't attempt a merge that may result in conflicts
@@ -33,11 +33,11 @@
     # PRETTY LOGS
 
     # compact log with branch names etc.
-    ls = !git log --color=always --decorate --graph --date=relative \
+    ls = !git log --decorate --graph --date=relative \
     --format=tformat:'%C(auto)%h%C(reset) -%C(auto)%d%C(reset) %s %C(dim)- %an, %ad%C(reset)'
 
     # Two-line log with wrapping (fits narrower windows)
-    l2 = log --color=always --decorate --graph --date=relative \
+    l2 = log --decorate --graph --date=relative \
     --format='%C(auto)%h%d %C(dim)%an, %ad%C(reset)%n%w(80,2,2)%s'
 
     # log All local and remote branches
@@ -47,7 +47,7 @@
     lu = !git ls HEAD `git for-each-ref --format='%(upstream:short)' HEAD $(git symbolic-ref --quiet HEAD)`
 
     # Long format - full commit message and summary of changes
-    ll = !git log --color=always --decorate --graph --stat-graph-width=30 --stat-count=30
+    ll = !git log --decorate --graph --stat-graph-width=30 --stat-count=30
 
     # reflog with dates and commit message subject
     rf = !GIT_PAGER='less -REXS' git log --walk-reflogs --format='%C(dim)%<(21,trunc)%ci%x08%x08%x08%x08%x08 %C(reset)%gd%C(reset): %C(auto)%h%C(reset) %gs %C(dim)- %<(33,trunc)%s%C(reset)'
