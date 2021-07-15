@@ -34,11 +34,11 @@
 
     # PRETTY LOGS
 
-    # compact log with branch names etc.
-    ls = log --graph --date=relative --format=tformat:'%C(auto)%h%C(reset) -%C(auto)%d%C(reset) %s %C(dim)- %an, %ad%C(reset)'
+    # compact log with wrapped lines and inobtrusive author info
+    ls = log --graph --date=relative --format='%C(auto)%h%d %C(dim)%an, %ad%C(reset)%n%w(80,2,2)%s'
 
-    # Two-line log with wrapping (fits narrower windows)
-    l2 = log --graph --date=relative --format='%C(auto)%h%d %C(dim)%an, %ad%C(reset)%n%w(80,2,2)%s'
+    # one-line log for maximum brevity
+    li = log --graph --date=relative --format=tformat:'%C(auto)%h%C(reset) -%C(auto)%d%C(reset) %s %C(dim)- %an, %ad%C(reset)'
 
     # log All local and remote branches
     la = ls HEAD --branches --remotes
