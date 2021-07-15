@@ -29,6 +29,8 @@
     s = status --short   # see also --branch option
     st = status
 
+    supdate = submodule update --init --recursive
+
 
     # PRETTY LOGS
 
@@ -48,6 +50,9 @@
 
     # Long format - full commit message and summary of changes
     ll = !git log --decorate --graph --stat-graph-width=30 --stat-count=30
+
+    # show changes in files (and changed commits in case of submodules)
+    lp = log --decorate --patch --submodule=log --topo-order
 
     # reflog with dates and commit message subject
     rf = !GIT_PAGER='less -REXS' git log --walk-reflogs --format='%C(dim)%<(21,trunc)%ci%x08%x08%x08%x08%x08 %C(reset)%gd%C(reset): %C(auto)%h%C(reset) %gs %C(dim)- %<(33,trunc)%s%C(reset)'
@@ -69,6 +74,7 @@
 [diff]
     # detect renamed files and show only actual differences between them
     renames = copies
+    submodule = log
 
 [merge]
     # in case of merge conflict also show how common ancestor looked like
@@ -83,3 +89,8 @@
     # automatically process "fixup!" commits when rebasing interactively
     autosquash = true
 
+[submodule]
+    recurse = true
+
+[status]
+    submodulesummary = true
