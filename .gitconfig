@@ -35,24 +35,22 @@
     # PRETTY LOGS
 
     # compact log with branch names etc.
-    ls = !git log --decorate --graph --date=relative \
-    --format=tformat:'%C(auto)%h%C(reset) -%C(auto)%d%C(reset) %s %C(dim)- %an, %ad%C(reset)'
+    ls = log --graph --date=relative --format=tformat:'%C(auto)%h%C(reset) -%C(auto)%d%C(reset) %s %C(dim)- %an, %ad%C(reset)'
 
     # Two-line log with wrapping (fits narrower windows)
-    l2 = log --decorate --graph --date=relative \
-    --format='%C(auto)%h%d %C(dim)%an, %ad%C(reset)%n%w(80,2,2)%s'
+    l2 = log --graph --date=relative --format='%C(auto)%h%d %C(dim)%an, %ad%C(reset)%n%w(80,2,2)%s'
 
     # log All local and remote branches
-    la = !git ls HEAD --branches --remotes
+    la = ls HEAD --branches --remotes
 
     # log both HEAD and its Upstream (if present)
     lu = !git ls HEAD `git for-each-ref --format='%(upstream:short)' HEAD $(git symbolic-ref --quiet HEAD)`
 
     # Long format - full commit message and summary of changes
-    ll = !git log --decorate --graph --stat-graph-width=30 --stat-count=30
+    ll = log --graph --stat-graph-width=30 --stat-count=30
 
     # show changes in files (and changed commits in case of submodules)
-    lp = log --decorate --patch --submodule=log --topo-order
+    lp = log --patch --submodule=log --topo-order
 
     # reflog with dates and commit message subject
     rf = !GIT_PAGER='less -REXS' git log --walk-reflogs --format='%C(dim)%<(21,trunc)%ci%x08%x08%x08%x08%x08 %C(reset)%gd%C(reset): %C(auto)%h%C(reset) %gs %C(dim)- %<(33,trunc)%s%C(reset)'
