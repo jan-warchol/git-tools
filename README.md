@@ -10,12 +10,12 @@ experience.
 Installation
 ------------
 
-Clone the repo and link the configuration file:
+Clone the repo and run installation script (it will backup your existing
+configuration):
 
 ```bash
 git clone https://github.com/jan-warchol/sensible-git
-mv -i ~/.gitconfig{,.old}  # backup your current config
-ln -s $(pwd)/sensible-git/.gitconfig ~/.gitconfig
+./sensible-git/install.sh
 ```
 
 
