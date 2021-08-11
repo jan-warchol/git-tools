@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# build upon standard git prompt function
+if [[ -e /usr/lib/git-core/git-sh-prompt ]]; then
+    source /usr/lib/git-core/git-sh-prompt
+fi
+
+GIT_PS1_SHOWDIRTYSTATE=1
+GIT_PS1_SHOWUNTRACKEDFILES=1
+GIT_PS1_DESCRIBE_STYLE="branch"
+GIT_PS1_SHOWUPSTREAM="verbose git"
+
+function submodule_status() {
+    module=$1
+    if [ ! -e $module/.git ]; then continue; fi
+
+    recorded_commit=$(git submodule status $module | cut -c2-41)
+    if [ $recorded_commit = "0000000000000000000000000000000000000000" ]; then
+        echo -n " $module: CONFLICT"
+    else
+        cd $module
+        behind=$(git rev-list --count ..$recorded_commit)
+        ahead=$(git rev-list --count $recorded_commit..)
+        [ $behind -ne 0 ] && behind="-${behind}" || behind=""
+        [ $ahead -ne 0 ] && ahead="+${ahead}" || ahead=""
+
+        __git_ps1 " ${module}${ahead}${behind}: %s" | sed 's|remotes/||'
+        cd ..
+    fi
+}
+
+if [ ! -e './.gitmodules' ]; then
+    # no submodules -> just run ordinary prompt status
+    __git_ps1
+else
+    __git_ps1 " [%s |"
+    submodules=$(git config --file .gitmodules --get-regexp path | awk '{ print $2 }')
+    for module in $submodules; do
+        submodule_status $module
+    done
+    echo -n "]"
+fi
+
