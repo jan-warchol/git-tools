@@ -1,0 +1,41 @@
+#!/bin/bash
+
+_strong="\033[1;97m"
+_reset="\033[0m"
+
+git -c status.submodulesummary=false status
+
+submodules=$(git config --file .gitmodules --get-regexp path | awk '{ print $2 }')
+for module in $submodules; do
+    if [ ! -e $module/.git ]; then continue; fi
+
+    # recorded_commit=$(git submodule status --cached $module | cut -c2-41)
+    current_commit=$(cd $module; git rev-parse HEAD)
+    recorded_commit=$(git ls-tree HEAD --long -- $module | cut -d' ' -f3)
+    module_status=$(git submodule status $module | cut -c1-41)
+    if [ $module_status = "U0000000000000000000000000000000000000000" ]; then
+        merged_commit=$(git ls-tree MERGE_HEAD --long -- $module | cut -d' ' -f3)
+        echo -e "\nSubmodule ${_strong}${module}${_reset}:"
+        cd $module
+        git tag OURS_HEAD $recorded_commit
+        git tag THEIRS_HEAD $merged_commit
+        git history --boundary $recorded_commit...$merged_commit
+        git tag -d OURS_HEAD >/dev/null
+        git tag -d THEIRS_HEAD >/dev/null
+        cd ..
+    else
+        if [ $recorded_commit = $current_commit ]; then
+            cd $module
+            echo -e "\nSubmodule ${_strong}${module}${_reset}:"
+            git log --oneline --no-decorate -1 HEAD
+            cd ..
+        else
+            echo -e "\nSubmodule ${_strong}${module}${_reset}:"
+            cd $module
+            git tag SUPERPROJECT_HEAD $recorded_commit
+            git history --boundary $recorded_commit...HEAD
+            git tag -d SUPERPROJECT_HEAD >/dev/null
+            cd ..
+        fi
+    fi
+done
