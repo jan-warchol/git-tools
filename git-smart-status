@@ -8,29 +8,47 @@ git -c status.submodulesummary=false status
 submodules=$(git config --file .gitmodules --get-regexp path | awk '{ print $2 }')
 for module in $submodules; do
     if [ ! -e $module/.git ]; then continue; fi
+    summary=$(git -c diff.submodule=log diff HEAD -- $module | head -1)
+    if [ -n "$summary" ]; then
+        echo -e "\n$(echo "$summary" | sed "s/$module/\\${_strong}${module}\\${_reset} -/")"
+    else
+        echo -e "\nSubmodule ${_strong}${module}${_reset}:"
+    fi
 
     # recorded_commit=$(git submodule status --cached $module | cut -c2-41)
     current_commit=$(cd $module; git rev-parse HEAD)
     recorded_commit=$(git ls-tree HEAD --long -- $module | cut -d' ' -f3)
-    module_status=$(git submodule status $module | cut -c1-41)
-    if [ $module_status = "U0000000000000000000000000000000000000000" ]; then
+    if [ -z $recorded_commit ]; then
+        cd $module
+        git history --boundary $current_commit -10
+        echo "(...)"
+        cd ..
+        continue
+    fi
+    if [ -e ".git/MERGE_HEAD" ]; then
         merged_commit=$(git ls-tree MERGE_HEAD --long -- $module | cut -d' ' -f3)
-        echo -e "\nSubmodule ${_strong}${module}${_reset}:"
         cd $module
         git tag OURS_HEAD $recorded_commit
         git tag THEIRS_HEAD $merged_commit
-        git history --boundary $recorded_commit...$merged_commit
+        git history --boundary HEAD $recorded_commit $merged_commit --not $(git merge-base --octopus HEAD $recorded_commit $merged_commit)
         git tag -d OURS_HEAD >/dev/null
         git tag -d THEIRS_HEAD >/dev/null
+        cd ..
+    elif [ -e ".git/rebase-merge" ]; then
+        rebased_commit=$(git ls-tree REBASE_HEAD --long -- $module | cut -d' ' -f3)
+        base_commit=$(git ls-tree $(cat .git/rebase-merge/onto) --long -- $module | cut -d' ' -f3)
+        cd $module
+        git tag REBASED_HEAD $rebased_commit
+        git tag TARGET_HEAD $base_commit
+        git history --boundary HEAD $rebased_commit $base_commit --not $(git merge-base --octopus  HEAD $rebased_commit $base_commit)
+        git tag -d REBASED_HEAD TARGET_HEAD >/dev/null
         cd ..
     else
         if [ $recorded_commit = $current_commit ]; then
             cd $module
-            echo -e "\nSubmodule ${_strong}${module}${_reset}:"
             git log --oneline --no-decorate -1 HEAD
             cd ..
         else
-            echo -e "\nSubmodule ${_strong}${module}${_reset}:"
             cd $module
             git tag SUPERPROJECT_HEAD $recorded_commit
             git history --boundary $recorded_commit...HEAD
