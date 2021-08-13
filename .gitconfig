@@ -28,7 +28,7 @@
     rs1 = reset HEAD~1   # "soft undo" - remove last commit, but keep its changes
 
     s = status --short   # see also --branch option
-    st = status
+    st = smart-status
 
     supdate = submodule update --init --recursive
 

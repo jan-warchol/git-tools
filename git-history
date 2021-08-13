@@ -1,0 +1,4 @@
+#!/bin/bash
+
+git log --graph --date=relative --format='%C(auto)%h%d %C(dim)%an, %ad%C(reset)%n%w(80,2,2)%s' "$@"
+

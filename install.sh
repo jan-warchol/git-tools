@@ -1,10 +1,19 @@
 #!/bin/bash
-
 set -e
 
 REPO_PATH="$(cd $(dirname "$0"); pwd)"
 gitconfig="$HOME/.gitconfig"
 target="$REPO_PATH/.gitconfig"
+_strong="\033[1;97m"
+_reset="\033[0m"
+
+# ensure this repository is in PATH
+if [[ ! "$PATH" == *$REPO_PATH* ]]; then
+    echo -e "\nexport PATH=\"\$PATH:$REPO_PATH\"" >> ~/.bashrc;
+fi
+
+# add a hook for replacing regular git prompt with recursive one
+echo 'export PS1=$(echo "$PS1" | sed "s/__git_ps1/__git_recursive_ps1/")' >> ~/.bashrc
 
 if [ "$gitconfig" -ef "$target" ]; then
     echo -e "Link already exists:\n  $gitconfig -> $target"
@@ -24,5 +33,6 @@ else
     ln -s "$target" "$gitconfig"
     [ -n "$NAME" ] && git config --global user.name "$NAME"
     [ -n "$EMAIL" ] && git config --global user.email "$EMAIL"
-    echo "Installation complete."
 fi
+
+echo -e "Installation complete. ${_strong}Reopen${_reset} your terminal to see effects."
