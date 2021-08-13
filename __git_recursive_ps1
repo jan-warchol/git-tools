@@ -3,6 +3,8 @@
 # build upon standard git prompt function
 if [[ -e /usr/lib/git-core/git-sh-prompt ]]; then
     source /usr/lib/git-core/git-sh-prompt
+elif [[ -e "C:/Program Files/Git/mingw64/share/git/completion/git-prompt.sh" ]]; then
+    source "C:/Program Files/Git/mingw64/share/git/completion/git-prompt.sh" 
 fi
 
 GIT_PS1_SHOWDIRTYSTATE=1
