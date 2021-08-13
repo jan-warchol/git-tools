@@ -8,16 +8,13 @@ elif [[ -e "C:/Program Files/Git/mingw64/share/git/completion/git-prompt.sh" ]];
 fi
 
 GIT_PS1_SHOWDIRTYSTATE=1
-GIT_PS1_SHOWUNTRACKEDFILES=1
 GIT_PS1_DESCRIBE_STYLE="branch"
 GIT_PS1_SHOWUPSTREAM="verbose git"
 
 function submodule_status() {
     module=$1
-    if [ ! -e $module/.git ]; then continue; fi
-
-    recorded_commit=$(git submodule status $module | cut -c2-41)
-    if [ $recorded_commit = "0000000000000000000000000000000000000000" ]; then
+    recorded_commit=$(git submodule status --cached $module | cut -c2-41)
+    if [ "$recorded_commit" = "0000000000000000000000000000000000000000" ]; then
         echo -n " $module: CONFLICT"
     else
         cd $module
@@ -38,6 +35,7 @@ else
     __git_ps1 " [%s |"
     submodules=$(git config --file .gitmodules --get-regexp path | awk '{ print $2 }')
     for module in $submodules; do
+        if [ ! -e $module/.git ]; then continue; fi
         submodule_status $module
     done
     echo -n "]"
