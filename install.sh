@@ -12,8 +12,10 @@ if [[ ! "$PATH" == *$REPO_PATH* ]]; then
     echo -e "\nexport PATH=\"\$PATH:$REPO_PATH\"" >> ~/.bashrc;
 fi
 
-# add a hook for replacing regular git prompt with recursive one
-echo 'export PS1=$(echo "$PS1" | sed "s/__git_ps1/__git_recursive_ps1/")' >> ~/.bashrc
+# add a hook for injecting submodule prompt at the end of the prompt line
+cat  >> ~/.bashrc << 'EOF'
+export PS1=$(echo "$PS1" | sed -E 's/(\\n)/ $(__git_submodules_ps1)\1/')
+EOF
 
 if [ "$gitconfig" -ef "$target" ]; then
     echo -e "Link already exists:\n  $gitconfig -> $target"

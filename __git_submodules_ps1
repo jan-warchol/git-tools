@@ -28,11 +28,8 @@ function submodule_status() {
     fi
 }
 
-if [ ! -e './.gitmodules' ]; then
-    # no submodules -> just run ordinary prompt status
-    __git_ps1
-else
-    __git_ps1 " [%s |"
+if [ -e './.gitmodules' ]; then
+    echo -n "["
     submodules=$(git config --file .gitmodules --get-regexp path | awk '{ print $2 }')
     for module in $submodules; do
         if [ ! -e $module/.git ]; then continue; fi

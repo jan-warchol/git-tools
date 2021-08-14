@@ -36,9 +36,9 @@ Here's a summary of the most interesting settings:
 - improved output layout and coloring for `status`, `blame` and `log`,
 - better default behaviour in case of merge conflicts, file copies etc.
 - Your prompt should now show the status of submodules, too.
-- Use `git smart-status` (or `git st`) to see more detailed information about
-  what's happening in the submodules. This is helpful especially when there are
-  merge conflicts.
+- Use `git detailed-submodule-status` (or `git st`) to see more information
+  about what's happening in the submodules. This is helpful especially when
+  there are merge conflicts.
 
 
 Other good stuff

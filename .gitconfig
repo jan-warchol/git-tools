@@ -28,7 +28,7 @@
     rs1 = reset HEAD~1   # "soft undo" - remove last commit, but keep its changes
 
     s = status --short   # see also --branch option
-    st = smart-status
+    st = !git -c status.submodulesummary=false status && git detailed-submodule-status
 
     supdate = submodule update --init --recursive
 
@@ -84,6 +84,8 @@
     # don't wrap lines in log and blame output (needed since git 2.1)
     log = "less -S"
     blame = "less -S"
+    # don't switch to alternate screen, output to terminal immediately
+    detailed-submodule-status = "less -REXS"
 
 [rebase]
     # automatically process "fixup!" commits when rebasing interactively

@@ -3,8 +3,6 @@
 _strong="\033[1;97m"
 _reset="\033[0m"
 
-git -c status.submodulesummary=false status
-
 submodules=$(git config --file .gitmodules --get-regexp path | awk '{ print $2 }')
 for module in $submodules; do
     if [ ! -e $module/.git ]; then continue; fi
