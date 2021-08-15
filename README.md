@@ -57,10 +57,14 @@ New commands and common aliases:
   concise log.
 - [`git divergence A B C`](git-divergence) - show how multiple branches `A` `B`
   and `C` differ (relative to common ancestor).
+- [`git smart-commit`](git-smart-commit) (aliased to `git ci`) - wrapper for
+  `git commit` that automatically includes modified files (if you don't specify
+  what to commit) and doesn't require quotes for commit message - example:
+  `git ci Update files`
 - [`git submodule-details`](git-submodule-details) - see how current submodule
   status is related to what is recorded in the superproject (show relevant
   history graph).  Especially helpful when there are merge conflicts.
-- Common aliases/shorthands, including [`ci`, `co`, `br` and `st`](.gitconfig#L7)
+- Common aliases/shorthands, including [`co`, `br` and `st`](.gitconfig#L7)
 - Additional log aliases [`la`, `ll`, `lp`](.gitconfig#L30) to show more
   information from repo history.
 

@@ -7,8 +7,8 @@
     br = branch
     co = checkout
 
-    # see what you're commiting when editing the commit message
-    ci = commit --verbose
+    # Intelligent wrapper for git commit. See git-smart-commit for details.
+    ci = smart-commit
 
     # Word-Diff (highlight individual changed words, not whole lines)
     wd = diff --word-diff=color

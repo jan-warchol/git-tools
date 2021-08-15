@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# Wrapper for "git commit":
+# - automatically adds --all if you didn't say what to commit
+# - recognizes paths and options
+# - treats other arguments as commit message (no quoting necessary)
+#
+# Example usage (with suggested alias ci = smart-commit):
+#
+#     git ci This is super simple
+
+CHANGE_SELECTOR=false   # does some argument specify what to commit?
+COMMIT_OPTS="--verbose"   # show diff (double-check what you commit)
+
+# analyze and group arguments into options, paths and message
+while [ $# -gt 0 ]; do
+  arg="$1"; shift
+  case "$arg" in
+    # options that take arguments - get the argument, too
+    -c|-C|--*message|-m|--fixup|--squash|-F|--file|--author|--date|-t|--template)
+      COMMIT_OPTS="$COMMIT_OPTS $arg $1"; shift
+      ;;
+    # options mutually exclusive with --all
+    -p|--patch|-o|--only|-i|--include|--interactive)
+      COMMIT_OPTS="$COMMIT_OPTS $arg"
+      CHANGE_SELECTOR=true
+      ;;
+    --)  # treat all remaining args as paths
+      COMMIT_PATHS="-- $@"
+      CHANGE_SELECTOR=true
+      break
+      ;;
+    -?*)  # options without arguments
+      COMMIT_OPTS="$COMMIT_OPTS $arg"
+      ;;
+    **)  # everything else -> commmit message
+      COMMIT_MSG="$(echo $COMMIT_MSG $arg)"   # echo -> trim extra whtespace
+      ;;
+  esac
+done
+
+# are there staged changes or options mutually exclusive with --all?
+if git diff --cached --quiet && ! $CHANGE_SELECTOR; then
+  echo Assuming you want to commit all changes.
+  COMMIT_OPTS="$COMMIT_OPTS --all"
+fi
+
+# message content must be quoted, but empty quotes would trigger error
+if [ -z "$COMMIT_MSG" ]; then
+  git commit $COMMIT_OPTS $COMMIT_PATHS
+else
+  git commit $COMMIT_OPTS --message "$COMMIT_MSG" $COMMIT_PATHS
+fi
