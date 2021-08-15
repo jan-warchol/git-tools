@@ -10,18 +10,12 @@
     # see what you're commiting when editing the commit message
     ci = commit --verbose
 
-    d = diff
-    dd = diff --submodule=diff
-    wd = diff --word-diff=color   # mnemonic: Word-Diff
-
-    g3 = grep --line-number --context 3
+    # Word-Diff (highlight individual changed words, not whole lines)
+    wd = diff --word-diff=color
 
     please = push --force-with-lease   # never use plain --force!
-    # unlike plain `pull`, this won't attempt a merge that may result in conflicts
-    pl = pull --ff-only
 
     rb = rebase
-    rbo = rebase --onto   # quite useful, see examples in 'git help rebase'
     rbi = rebase --interactive
 
     rs = reset
@@ -35,7 +29,7 @@
 
     # PRETTY LOGS
 
-    # See git-pretty-log for definition
+    # Compact and very readable log. See git-pretty-log for definition.
     l  = pretty-log
 
     # (L)og (A)ll local and remote branches
@@ -44,17 +38,13 @@
     # (L)og current branch and its (U)pstream
     lu = pretty-log --boundary HEAD...@{upstream}
 
-    # one-line log for maximum brevity
-    li = log --graph --date=relative --format='%C(auto)%h -%d %s %C(dim)- %an, %ad%C(reset)'
-
     # (L)ong (L)og format - full commit message and summary of changes
     ll = log --graph --stat-graph-width=30 --stat-count=30
 
-    # show changes in files (and commits in case of submodules)
+    # (Log) with (P)atches (show changes in files/submodules)
     lp = log --patch --submodule=log --topo-order
-    lpp = log --patch --submodule=diff --topo-order
 
-    # reflog with dates and commit message subject
+    # reflog with better format (dates and commit message subject)
     rf = !GIT_PAGER='less -REXS' git log --walk-reflogs --format='%C(dim)%<(21,trunc)%ci%x08%x08%x08%x08%x08 %C(reset)%gd%C(reset): %C(auto)%h%C(reset) %gs %C(dim)- %<(33,trunc)%s%C(reset)'
 
 
@@ -66,13 +56,13 @@
     changed = yellow
 
 [core]
-    # display non-ASCII characters (e.g. Polish) instead of quoting them
+    # display non-ASCII characters (e.g. Polish) instead of escaping them
     quotepath = false
     # restore default pager behavior (needed because we manually set $LESS)
     pager = "less -FRX"
 
 [diff]
-    # detect renamed files and show only actual differences between them
+    # detect renamed/copied files and show only actual differences between them
     renames = copies
     submodule = log
 
@@ -86,10 +76,6 @@
     blame = "less -S"
     # don't switch to alternate screen, output to terminal immediately
     detailed-submodule-status = "less -REXS"
-
-[rebase]
-    # automatically process "fixup!" commits when rebasing interactively
-    autosquash = true
 
 [submodule]
     recurse = true
