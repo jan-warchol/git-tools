@@ -28,7 +28,7 @@ for module in $submodules; do
         cd $module
         git tag OURS_HEAD $recorded_commit
         git tag THEIRS_HEAD $merged_commit
-        git pretty-log --boundary HEAD $recorded_commit $merged_commit --not $(git merge-base --octopus HEAD $recorded_commit $merged_commit)
+        git divergence HEAD $recorded_commit $merged_commit
         git tag -d OURS_HEAD >/dev/null
         git tag -d THEIRS_HEAD >/dev/null
         cd ..
@@ -38,7 +38,7 @@ for module in $submodules; do
         cd $module
         git tag REBASED_HEAD $rebased_commit
         git tag TARGET_HEAD $base_commit
-        git pretty-log --boundary HEAD $rebased_commit $base_commit --not $(git merge-base --octopus  HEAD $rebased_commit $base_commit)
+        git divergence HEAD $rebased_commit $base_commit
         git tag -d REBASED_HEAD TARGET_HEAD >/dev/null
         cd ..
     else
@@ -49,7 +49,7 @@ for module in $submodules; do
         else
             cd $module
             git tag SUPERPROJECT_HEAD $recorded_commit
-            git pretty-log --boundary $recorded_commit...HEAD
+            git divergence $recorded_commit HEAD
             git tag -d SUPERPROJECT_HEAD >/dev/null
             cd ..
         fi

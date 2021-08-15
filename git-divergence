@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Log differing commits from listed revisions (exclude common part of history).
+
+for arg in "$@"; do
+    # Separate args (revisions) from options - options are only for log command.
+    if [[ "$arg" =~ --.* ]]; then
+        options="$options $arg"
+    else
+        args="$args $arg"
+    fi
+done
+
+# fall back to "git log --oneline --graph" if "git pretty-log" is not present
+: "${LOG_CMD:=$(which git-pretty-log >/dev/null &&
+                echo 'pretty-log' ||
+                echo 'log --oneline --graph')}"
+
+git $LOG_CMD --boundary $args $options --not $(git merge-base --octopus $args)
