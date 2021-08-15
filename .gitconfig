@@ -35,19 +35,19 @@
 
     # PRETTY LOGS
 
-    # compact log with wrapped lines and inobtrusive author info
-    ls = log --graph --date=relative --format='%C(auto)%h%d %C(dim)%an, %ad%C(reset)%n%w(80,2,2)%s'
+    # See git-pretty-log for definition
+    l  = pretty-log
+
+    # (L)og (A)ll local and remote branches
+    la = pretty-log HEAD --branches --remotes
+
+    # (L)og current branch and its (U)pstream
+    lu = pretty-log --boundary HEAD...@{upstream}
 
     # one-line log for maximum brevity
-    li = log --graph --date=relative --format=tformat:'%C(auto)%h%C(reset) -%C(auto)%d%C(reset) %s %C(dim)- %an, %ad%C(reset)'
+    li = log --graph --date=relative --format='%C(auto)%h -%d %s %C(dim)- %an, %ad%C(reset)'
 
-    # log All local and remote branches
-    la = ls HEAD --branches --remotes
-
-    # log both HEAD and its Upstream (if present)
-    lu = !git ls HEAD `git for-each-ref --format='%(upstream:short)' HEAD $(git symbolic-ref --quiet HEAD)`
-
-    # Long format - full commit message and summary of changes
+    # (L)ong (L)og format - full commit message and summary of changes
     ll = log --graph --stat-graph-width=30 --stat-count=30
 
     # show changes in files (and commits in case of submodules)
