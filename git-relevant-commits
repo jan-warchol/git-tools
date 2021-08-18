@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Return commit range relevant to current branch:
+# - new local commits (unpushed to upstream branch)
+# - new remote commits (unmerged from upstream branch)
+# - any other commits from current branch not merged into mainline
+
+# Convert special refs to branch names (if they exist).
+current=$(git rev-parse --abbrev-ref --verify HEAD 2>/dev/null)
+upstream=$(git rev-parse --abbrev-ref --verify HEAD@{upstream} 2>/dev/null)
+mainline=$(git rev-parse --abbrev-ref --verify origin/HEAD 2>/dev/null)
+
+branches="$current $upstream $mainline"
+merge_base=$(git merge-base --octopus $branches)
+
+# echo "Debug: current=$current upstream=$upstream mainline=$mainline" 1>&2
+# echo "Debug: merge_base=$merge_base" 1>&2
+
+# If the resulting commit range would be empty, just show last commit.
+if [ -z "$(git rev-list $branches --not $merge_base)" ]; then
+    echo HEAD^!   # ^! excludes all parents
+else
+    echo $branches --not $merge_base
+fi
