@@ -55,17 +55,22 @@ GIT_PROMPT_END=" \$(__git_submodules_ps1)$GIT_PROMPT_ORIGINAL_END"
 Features
 --------
 
-Here's a summary of the most interesting settings:
+New commands and common aliases:
 
-- aliases for displaying **awesome [logs](.gitconfig#L32)**
-  (see [screenshot](https://i.imgur.com/a4auwdx.png)),
-- a dozen of common shorthands, including `ci`, `co`, `br` and `st`,
+- [`git pretty-log`](git-pretty-log) (aliased to `git l`) - clear, readable and
+  concise log.
+- [`git divergence A B C`](git-divergence) - show how multiple branches `A` `B`
+  and `C` differ (relative to common ancestor).
+- `git detailed-submodule-status` - see how current submodule status is related
+  to what is recorded in the superproject (show relevant history graph).
+  Especially helpful when there are merge conflicts.
+- Common aliases/shorthands, including [`ci`, `co`, `br` and `st`](.gitconfig#L7)
+- Additional log aliases [`la`, `ll`, `lp`](.gitconfig#L30) to show more
+  information from repo history.
+
+Settings that should have been the default:
 - improved output layout and coloring for `status`, `blame` and `log`,
-- better default behaviour in case of merge conflicts, file copies etc.
-- Your prompt should now show the status of submodules, too.
-- Use `git detailed-submodule-status` (or `git st`) to see more information
-  about what's happening in the submodules. This is helpful especially when
-  there are merge conflicts.
+- better display of merge conflicts, info about copied files etc.
 
 
 Other good stuff
