@@ -22,7 +22,7 @@
     rs1 = reset HEAD~1   # "soft undo" - remove last commit, but keep its changes
 
     s = status --short   # see also --branch option
-    st = !git -c status.submodulesummary=false status && git detailed-submodule-status
+    st = !git -c status.submodulesummary=false status && git submodule-details
 
     supdate = submodule update --init --recursive
 
@@ -75,7 +75,7 @@
     log = "less -S"
     blame = "less -S"
     # don't switch to alternate screen, output to terminal immediately
-    detailed-submodule-status = "less -REXS"
+    submodule-details = "less -REXS"
 
 [submodule]
     recurse = true

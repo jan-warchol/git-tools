@@ -57,9 +57,9 @@ New commands and common aliases:
   concise log.
 - [`git divergence A B C`](git-divergence) - show how multiple branches `A` `B`
   and `C` differ (relative to common ancestor).
-- `git detailed-submodule-status` - see how current submodule status is related
-  to what is recorded in the superproject (show relevant history graph).
-  Especially helpful when there are merge conflicts.
+- [`git submodule-details`](git-submodule-details) - see how current submodule
+  status is related to what is recorded in the superproject (show relevant
+  history graph).  Especially helpful when there are merge conflicts.
 - Common aliases/shorthands, including [`ci`, `co`, `br` and `st`](.gitconfig#L7)
 - Additional log aliases [`la`, `ll`, `lp`](.gitconfig#L30) to show more
   information from repo history.
