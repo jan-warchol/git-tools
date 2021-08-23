@@ -10,20 +10,31 @@ experience.
 Installation
 ------------
 
-Clone the repo and run installation script (it will backup your existing
-configuration):
+Clone the repo:
 
 ```bash
 git clone https://github.com/jan-warchol/sensible-git
-./sensible-git/install.sh
 ```
 
-Manual installation:
-1. Clone this repository.
-1. Ensure it's in your PATH.  Note that you cannot use tilde `~` in PATH, you
-   have to use `$HOME`.
-1. In your prompt definition, replace `__git_ps1` with `__git_recursive_ps1`.
+Add it to your PATH to make new git commands available:
 
+```bash
+echo 'export PATH="$PATH:'$PWD/sensible-git'"' >> ~/.bashrc;
+```
+
+Import settings to your `.gitconfig`:
+
+```bash
+echo -e "[include]\n\tpath = $PWD/sensible-git/.gitconfig" >> ~/.gitconfig
+```
+
+Edit your prompt definition to include a call to `__git_submodules_ps1`.
+If you use magicmonty/bash-git-prompt, add this to your `.bashrc`:
+
+```bash
+GIT_PROMPT_ORIGINAL_END="\n\[\033[0;37m\]\$(date +%H:%M)\[\033[0;0m\] $ "
+GIT_PROMPT_END=" \$(__git_submodules_ps1)$GIT_PROMPT_ORIGINAL_END"
+```
 
 Features
 --------
