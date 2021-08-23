@@ -10,30 +10,25 @@ experience.
 Installation
 ------------
 
-Clone the repo:
+Clone the repo and run installation script:
 
 ```bash
 git clone https://github.com/jan-warchol/git-ninja-tools
+./git-ninja-tools/install.sh
 ```
 
-Add it to your PATH to make new git commands available:
+Manual installation:
+1. Clone this repo
+1. Add it to your PATH to make new git commands available
+1. Import settings from `.gitconfig` into your git configuration file
 
-```bash
-echo 'export PATH="$PATH:'$PWD/git-ninja-tools'"' >> ~/.bashrc;
-```
+### Customizing prompt
 
-Import settings to your `.gitconfig`:
+Edit your prompt definition to include a call to `__git_submodules_ps1`:
 
-```bash
-echo -e "[include]\n\tpath = $PWD/git-ninja-tools/.gitconfig" >> ~/.gitconfig
-```
-
-### Customizing your prompt
-
-Edit your prompt definition to include a call to `__git_submodules_ps1`.
-
-If you don't have any cutom prompt setup, use the recommended prompt config -
-paste the following to your `.bashrc`:
+**If you don't have a customized prompt:** paste the following snippet to your
+`.bashrc` to define a simple and elegant prompt, displaying status of your repo
+and sumbodules:
 
 ```bash
 # Using \[ and \] is necessary to prevent weird behavior (lines overlapping).
@@ -45,7 +40,8 @@ GIT_PS1_SHOWUPSTREAM="verbose git"
 export PS1="${blue}\u ${cyan}\w${reset}\$(__git_ps1) \$(__git_submodules_ps1)\n\\$ "
 ```
 
-If you already use magicmonty/bash-git-prompt, add this to your `.bashrc`:
+**If you use magicmonty/bash-git-prompt:** add this to your `.bashrc` to append
+submodule status to the prompt before line break:
 
 ```bash
 GIT_PROMPT_ORIGINAL_END="\n\[\033[0;37m\]\$(date +%H:%M)\[\033[0;0m\] $ "

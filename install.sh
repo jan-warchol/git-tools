@@ -2,39 +2,23 @@
 set -e
 
 REPO_PATH="$(cd $(dirname "$0"); pwd)"
-gitconfig="$HOME/.gitconfig"
-target="$REPO_PATH/.gitconfig"
 _strong="\033[1;97m"
 _reset="\033[0m"
 
 # ensure this repository is in PATH
 if [[ ! "$PATH" == *$REPO_PATH* ]]; then
+    echo "Adding $REPO_PATH to PATH..."
     echo -e "\nexport PATH=\"\$PATH:$REPO_PATH\"" >> ~/.bashrc;
 fi
 
-# add a hook for injecting submodule prompt at the end of the prompt line
-cat  >> ~/.bashrc << 'EOF'
-export PS1=$(echo "$PS1" | sed -E 's/(\\n)/ $(__git_submodules_ps1)\1/')
-EOF
-
-if [ "$gitconfig" -ef "$target" ]; then
-    echo -e "Link already exists:\n  $gitconfig -> $target"
-else
-    # read from existing config to re-apply after installation
-    NAME="$(git config --get user.name || true)"
-    EMAIL="$(git config --get user.email || true)"
-
-    # make a backup
-    if [ -e "$gitconfig" ]; then
-        mv -i "$gitconfig" "$gitconfig.old"
-        echo "Existing config file renamed to $gitconfig.old"
-    fi
-
-    # install and configure name & email
-    echo -e "Creating link:\n  $gitconfig -> $target"
-    ln -s "$target" "$gitconfig"
-    [ -n "$NAME" ] && git config --global user.name "$NAME"
-    [ -n "$EMAIL" ] && git config --global user.email "$EMAIL"
+# ensure git configuration file is included
+if ! git config --get-all include.path | grep $REPO_PATH; then
+    echo "Adding $REPO_PATH/.gitconfig to ~/.gitconfig..."
+    cat >> $HOME/.gitconfig <<- EOF
+		[include]
+		    path = $REPO_PATH/.gitconfig
+		EOF
 fi
 
-echo -e "Installation complete. ${_strong}Reopen${_reset} your terminal to see effects."
+echo -e "Installation complete."
+echo -e "${_strong}Reopen your terminal${_reset} to see effects."
