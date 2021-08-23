@@ -13,19 +13,19 @@ Installation
 Clone the repo:
 
 ```bash
-git clone https://github.com/jan-warchol/sensible-git
+git clone https://github.com/jan-warchol/git-ninja-tools
 ```
 
 Add it to your PATH to make new git commands available:
 
 ```bash
-echo 'export PATH="$PATH:'$PWD/sensible-git'"' >> ~/.bashrc;
+echo 'export PATH="$PATH:'$PWD/git-ninja-tools'"' >> ~/.bashrc;
 ```
 
 Import settings to your `.gitconfig`:
 
 ```bash
-echo -e "[include]\n\tpath = $PWD/sensible-git/.gitconfig" >> ~/.gitconfig
+echo -e "[include]\n\tpath = $PWD/git-ninja-tools/.gitconfig" >> ~/.gitconfig
 ```
 
 Edit your prompt definition to include a call to `__git_submodules_ps1`.
