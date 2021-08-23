@@ -5,13 +5,16 @@ _reset="\033[0m"
 
 # iterate over initialized submodules (handles whitespace in submodule paths)
 git submodule foreach 'echo $sm_path' | grep -v '^Entering' | while read -r module; do
-    diff_summary=$(git -c diff.submodule=log diff HEAD -- $module | grep "^Submodule")
+    current_commit=$(cd "$module"; git rev-parse HEAD)
+    recorded_commit=$(git ls-tree HEAD --long -- "$module" | cut -d' ' -f3)
+    sm_status=$(git submodule status -- "$module" | cut -c1-10)
+
+    diff_summary=$(git diff --submodule=log HEAD -- $module | grep "^Submodule")
+    [ $sm_status = "U000000000" ] && diff_summary="Submodule $module (CONFLICT):"
     summary=${diff_summary:-Submodule $module (unchanged):}
     echo -e $(echo "\n$summary" | sed "s/$module/\\${_strong}$module\\${_reset}/")
 
     # recorded_commit=$(git submodule status --cached $module | cut -c2-41)
-    current_commit=$(cd "$module"; git rev-parse HEAD)
-    recorded_commit=$(git ls-tree HEAD --long -- "$module" | cut -d' ' -f3)
     if [ -z $recorded_commit ]; then
         cd "$module"
         git log --oneline HEAD -10
