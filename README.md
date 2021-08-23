@@ -1,5 +1,5 @@
-Sensible git
-============
+Git ninja tools
+===============
 
 ![Screenshot of sensible-dotfiles](https://i.imgur.com/a4auwdx.png)
 
@@ -28,8 +28,24 @@ Import settings to your `.gitconfig`:
 echo -e "[include]\n\tpath = $PWD/git-ninja-tools/.gitconfig" >> ~/.gitconfig
 ```
 
+### Customizing your prompt
+
 Edit your prompt definition to include a call to `__git_submodules_ps1`.
-If you use magicmonty/bash-git-prompt, add this to your `.bashrc`:
+
+If you don't have any cutom prompt setup, use the recommended prompt config -
+paste the following to your `.bashrc`:
+
+```bash
+# Using \[ and \] is necessary to prevent weird behavior (lines overlapping).
+blue="\[\e[94m\]"
+cyan="\[\e[96m\]"
+reset="\[\e[0m\]"
+GIT_PS1_SHOWDIRTYSTATE=1
+GIT_PS1_SHOWUPSTREAM="verbose git"
+export PS1="${blue}\u ${cyan}\w${reset}\$(__git_ps1) \$(__git_submodules_ps1)\n\\$ "
+```
+
+If you already use magicmonty/bash-git-prompt, add this to your `.bashrc`:
 
 ```bash
 GIT_PROMPT_ORIGINAL_END="\n\[\033[0;37m\]\$(date +%H:%M)\[\033[0;0m\] $ "
