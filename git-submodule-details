@@ -3,6 +3,11 @@
 _strong="\033[1;97m"
 _reset="\033[0m"
 
+# Mention uninitialized submodules first.
+git submodule | grep "^-" | cut -c43- | while read -r module; do
+    echo -e "Submodule ${_strong}$module${_reset} not initialized/loaded."
+done
+
 # iterate over initialized submodules (handles whitespace in submodule paths)
 git submodule foreach 'echo $sm_path' | grep -v '^Entering' | while read -r module; do
     current_commit=$(cd "$module"; git rev-parse HEAD)
