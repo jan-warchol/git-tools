@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# Show continuously refreshed graph of git history (like `watch` command,
+# but `watch` doesn't work with colored git log, so we use a shell loop)
+
+TARGET=${@:-"--branches --remotes HEAD"}
+# fall back to "git log --oneline --graph" if "git pretty-log" is not present
+: "${LOG_CMD:=$(which git-pretty-log >/dev/null &&
+                echo 'git pretty-log' ||
+                echo 'git log --oneline --graph')}"
+
+# force coloring (git disables it by default when writing to a file)
+COMMAND="$LOG_CMD --color $TARGET"
+OUTPUT="/tmp/git-watch-history/$(pwd | tr '/' '_')"
+mkdir -p `dirname "$OUTPUT"`
+
+while true; do
+    # trim command output in case it doesn't fit the screen
+    TERMINAL_HEIGHT=$(tput lines)
+    # subtract two lines for heading and one for the cursor
+    OUTPUT_HEIGHT=$(echo $TERMINAL_HEIGHT - 3 | bc)
+
+    # use a temp file to avoid blinking
+    $COMMAND | head -${OUTPUT_HEIGHT} > "$OUTPUT"
+
+    # clear terminal buffer completely (as opposed to "clear" command)
+    tput reset
+    printf "[%s] History of \"$TARGET\":\n\n" "$(date +%H:%M:%S)"
+    # less allows disabling line wrapping (as opposed to "cat")
+    less -SXE "$OUTPUT"
+    sleep 0.5
+done
