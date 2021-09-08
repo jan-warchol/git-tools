@@ -11,8 +11,14 @@ if [[ ! "$PATH" == *$REPO_PATH* ]]; then
     echo -e "\nexport PATH=\"\$PATH:$REPO_PATH\"" >> ~/.bashrc;
 fi
 
+# ensure autocompletion is loaded
+if ! type -t _git_pretty_log 2>/dev/null; then
+    echo "Configuring autocompletion..."
+    echo -e "\nsource \"$REPO_PATH/bash-completion.sh\"" >> ~/.bashrc;
+fi
+
 # ensure git configuration file is included
-if ! git config --get-all include.path | grep $REPO_PATH; then
+if ! git config --get-all include.path | grep $REPO_PATH > /dev/null; then
     echo "Adding $REPO_PATH/.gitconfig to ~/.gitconfig..."
     cat >> $HOME/.gitconfig <<- EOF
 		[include]

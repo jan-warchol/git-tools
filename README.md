@@ -20,6 +20,8 @@ git clone https://github.com/jan-warchol/git-ninja-tools
 Manual installation:
 1. Clone this repo
 1. Add it to your PATH to make new git commands available
+1. Source `bash-completion.sh` in your bash configuration to enable
+   autocompletion for these new commands
 1. Import settings from `.gitconfig` into your git configuration file
 
 ### Customizing prompt
