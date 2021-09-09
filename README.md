@@ -21,34 +21,34 @@ Manual installation:
 1. Clone this repo
 1. Add it to your PATH to make new git commands available
 1. Source `bash-completion.sh` in your bash configuration to enable
-   autocompletion for these new commands
+   autocompletion for new commands
 1. Import settings from `.gitconfig` into your git configuration file
 
-### Customizing prompt
+### Repository & submodules status in prompt
 
 Edit your prompt definition to include a call to `__git_submodules_ps1`:
 
-**If you don't have a customized prompt:** paste the following snippet to your
-`.bashrc` to define a simple and elegant prompt, displaying status of your repo
-and sumbodules:
+* If you use the **default system prompt:** paste the following snippet to your
+  `.bashrc` to use a simple and elegant prompt that displays status of your
+  repo and sumbodules:
 
-```bash
-# Using \[ and \] is necessary to prevent weird behavior (lines overlapping).
-blue="\[\e[94m\]"
-cyan="\[\e[96m\]"
-reset="\[\e[0m\]"
-GIT_PS1_SHOWDIRTYSTATE=1
-GIT_PS1_SHOWUPSTREAM="verbose git"
-export PS1="${blue}\u ${cyan}\w${reset}\$(__git_ps1) \$(__git_submodules_ps1)\n\\$ "
-```
+  ```bash
+  # Using \[ and \] is necessary to prevent weird behavior (lines overlapping).
+  blue="\[\e[94m\]"
+  cyan="\[\e[96m\]"
+  reset="\[\e[0m\]"
+  GIT_PS1_SHOWDIRTYSTATE=1
+  GIT_PS1_SHOWUPSTREAM="verbose git"
+  export PS1="${blue}\u ${cyan}\w${reset}\$(__git_ps1) \$(__git_submodules_ps1)\n\\$ "
+  ```
 
-**If you use magicmonty/bash-git-prompt:** add this to your `.bashrc` to append
-submodule status to the prompt before line break:
+* If you use **magicmonty/bash-git-prompt:** add this to your `.bashrc` to
+  append submodule status to the prompt before line break:
 
-```bash
-GIT_PROMPT_ORIGINAL_END="\n\[\033[0;37m\]\$(date +%H:%M)\[\033[0;0m\] $ "
-GIT_PROMPT_END=" \$(__git_submodules_ps1)$GIT_PROMPT_ORIGINAL_END"
-```
+  ```bash
+  GIT_PROMPT_ORIGINAL_END="\n\[\033[0;37m\]\$(date +%H:%M)\[\033[0;0m\] $ "
+  GIT_PROMPT_END=" \$(__git_submodules_ps1)$GIT_PROMPT_ORIGINAL_END"
+  ```
 
 Features
 --------

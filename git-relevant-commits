@@ -5,6 +5,7 @@
 # - new remote commits (unmerged from upstream branch)
 # - any other commits from current branch not merged into mainline
 
+target=${1:-HEAD}
 # Convert special refs to branch names (if they exist).
 current=$(git rev-parse --abbrev-ref --verify HEAD 2>/dev/null)
 upstream=$(git rev-parse --abbrev-ref --verify HEAD@{upstream} 2>/dev/null)

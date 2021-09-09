@@ -10,8 +10,9 @@
     # Intelligent wrapper for git commit. See git-smart-commit for details.
     ci = smart-commit
 
-    # Word-Diff (highlight individual changed words, not whole lines)
-    wd = diff --word-diff=color
+    d = diff --submodule=log
+    # (W)ord-(D)iff (highlight individual changed words, not whole lines)
+    wd = diff --submodule=log--word-diff=color
 
     please = push --force-with-lease   # never use plain --force!
 
@@ -64,7 +65,6 @@
 [diff]
     # detect renamed/copied files and show only actual differences between them
     renames = copies
-    submodule = log
 
 [merge]
     # in case of merge conflict also show how common ancestor looked like
