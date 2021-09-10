@@ -1,61 +1,70 @@
 #!/bin/bash
 
 _strong="\033[1;97m"
+_red="\033[31m"
 _reset="\033[0m"
+
+# Note: using `while read` gives us support for spaces in dir names.
 
 # Mention uninitialized submodules first.
 git submodule | grep "^-" | cut -c43- | while read -r module; do
     echo -e "Submodule ${_strong}$module${_reset} not initialized/loaded."
 done
 
-# iterate over initialized submodules (handles whitespace in submodule paths)
+# Iterate over initialized submodules.
 git submodule foreach 'echo $sm_path' | grep -v '^Entering' | while read -r module; do
+    # Gather information about actual and recorded submodule status.
     current_commit=$(cd "$module"; git rev-parse HEAD)
-    recorded_commit=$(git ls-tree HEAD --long -- "$module" | cut -d' ' -f3)
-    sm_status=$(git submodule status -- "$module" | cut -c1-10)
+    # Note: `git ls-tree` mixes tabs and spaces for separating columns, but awk handles this.
+    recorded_commit=$(git ls-tree HEAD -- "$module" | awk '{print $3}')
+    if [ -e ".git/MERGE_HEAD" ]; then
+        merged_commit=$(git ls-tree MERGE_HEAD -- "$module" | awk '{print $3}')
+    elif [ -e ".git/rebase-merge" ]; then
+        rebased_commit=$(git ls-tree REBASE_HEAD -- "$module" | awk '{print $3}')
+        base_commit=$(git ls-tree $(cat .git/rebase-merge/onto) -- "$module" | awk '{print $3}')
+    fi
 
+    # Show heading with summary information.
     diff_summary=$(git diff --submodule=log HEAD -- $module | grep "^Submodule")
+    sm_status=$(git submodule status -- "$module" | cut -c1-10)
     [ $sm_status = "U000000000" ] && diff_summary="Submodule $module (CONFLICT):"
     summary=${diff_summary:-Submodule $module (unchanged):}
     echo -e $(echo "\n$summary" | sed "s/$module/\\${_strong}$module\\${_reset}/")
 
-    # recorded_commit=$(git submodule status --cached $module | cut -c2-41)
+    cd "$module"
+
+    # newly added submodule (not committed in superproject yet)
     if [ -z $recorded_commit ]; then
-        cd "$module"
-        git log --oneline HEAD -10
+        git log --oneline --no-decorate HEAD -5
         echo "(...)"
-        cd ..
-        continue
-    fi
-    if [ -e ".git/MERGE_HEAD" ]; then
-        merged_commit=$(git ls-tree MERGE_HEAD --long -- "$module" | cut -d' ' -f3)
-        cd "$module"
+    # check that requested commit is actually present in submodule
+    elif ! git rev-list $recorded_commit &> /dev/null; then
+        echo "Superproject wants the submodule to be at commit $recorded_commit"
+        echo -e "but this ${_red}commit is not present${_reset} in submodule database."
+    # superproject merge in progress
+    elif [ -n "$merged_commit" ]; then
         git tag OURS_HEAD $recorded_commit
         git tag THEIRS_HEAD $merged_commit
         git divergence HEAD $recorded_commit $merged_commit
         git tag -d OURS_HEAD >/dev/null
         git tag -d THEIRS_HEAD >/dev/null
-        cd ..
-    elif [ -e ".git/rebase-merge" ]; then
-        rebased_commit=$(git ls-tree REBASE_HEAD --long -- "$module" | cut -d' ' -f3)
-        base_commit=$(git ls-tree $(cat .git/rebase-merge/onto) --long -- "$module" | cut -d' ' -f3)
-        cd "$module"
+    # superproject rebase in progress
+    elif [ -e "$rebased_commit" ]; then
         git tag REBASED_HEAD $rebased_commit
         git tag TARGET_HEAD $base_commit
         git divergence HEAD $rebased_commit $base_commit
         git tag -d REBASED_HEAD TARGET_HEAD >/dev/null
-        cd ..
+    # just show recorded commit if it hasn't changed
+    elif [ $recorded_commit = $current_commit ]; then
+        git log --oneline --no-decorate -1 HEAD
+        # if there are changed files in submodule
+        [[ $summary =~ "contains modified content" ]] && git status --short
+    # different commit checked out in submodule
     else
-        if [ $recorded_commit = $current_commit ]; then
-            cd "$module"
-            git log --oneline --no-decorate -1 HEAD
-            cd ..
-        else
-            cd "$module"
-            git tag SUPERPROJECT_HEAD $recorded_commit
-            git divergence $recorded_commit HEAD
-            git tag -d SUPERPROJECT_HEAD >/dev/null
-            cd ..
-        fi
+        git tag SUPERPROJECT_HEAD $recorded_commit
+        git divergence $recorded_commit HEAD
+        git tag -d SUPERPROJECT_HEAD >/dev/null
     fi
+
+    cd ..
 done

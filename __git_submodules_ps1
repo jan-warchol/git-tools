@@ -18,13 +18,17 @@ function submodule_status() {
         echo -n " $module: CONFLICT"
     else
         cd "$module"
-        behind_count=$(git rev-list --count ..$recorded_commit)
-        ahead_count=$(git rev-list --count $recorded_commit..)
-        [ $behind_count -ne 0 ] && behind="-${behind_count}"
-        [ $ahead_count -ne 0 ] && ahead="+${ahead_count}"
-        [ -n "$behind$ahead" ] && separator=" "
+        if ! git rev-list $recorded_commit &> /dev/null; then
+            echo -n "$module: MISSING COMMIT"
+        else
+            behind_count=$(git rev-list --count ..$recorded_commit)
+            ahead_count=$(git rev-list --count $recorded_commit..)
+            [ $behind_count -ne 0 ] && behind="-${behind_count}"
+            [ $ahead_count -ne 0 ] && ahead="+${ahead_count}"
+            [ -n "$behind$ahead" ] && separator=" "
 
-        __git_ps1 "${module}${separator}${ahead}${behind}: %s" | sed 's|remotes/||'
+            __git_ps1 "${module}${separator}${ahead}${behind}: %s" | sed 's|remotes/||'
+        fi
         cd ..
     fi
 }
