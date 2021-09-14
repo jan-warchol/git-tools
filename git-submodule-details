@@ -66,5 +66,11 @@ git submodule foreach 'echo $sm_path' | grep -v '^Entering' | while read -r modu
         git tag -d SUPERPROJECT_HEAD >/dev/null
     fi
 
+    mainline=$(git rev-parse --abbrev-ref --verify origin/HEAD 2>/dev/null)
+    if [ -n "$mainline" ]; then
+        behind_count=$(git rev-list --count ..$mainline)
+        ahead_count=$(git rev-list --count $mainline..)
+        echo $ahead_count commits ahead, $behind_count commits behind $mainline.
+    fi
     cd ..
 done
