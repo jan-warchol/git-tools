@@ -7,9 +7,9 @@
 
 target=${1:-HEAD}
 # Convert special refs to branch names (if they exist).
-current=$(git rev-parse --abbrev-ref --verify HEAD 2>/dev/null)
-upstream=$(git rev-parse --abbrev-ref --verify HEAD@{upstream} 2>/dev/null)
-mainline=$(git rev-parse --abbrev-ref --verify origin/HEAD 2>/dev/null)
+current=$(git rev-parse --symbolic-full-name $target 2>/dev/null)
+upstream=$(git rev-parse --symbolic-full-name $target@{upstream} 2>/dev/null)
+mainline=$(git rev-parse --symbolic-full-name origin/HEAD 2>/dev/null)
 
 branches="$current $upstream $mainline"
 merge_base=$(git merge-base --octopus $branches)
