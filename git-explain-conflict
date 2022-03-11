@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Display changes that led to merge conflict.
+
+show_usage() {
+    echo "Usage: git explain-conflict <side> <path>"
+    echo "       <side> can be either --left or --right."
+    exit 1
+}
+
+if [ $# -lt 2 ]; then show_usage; fi
+
+# Parse arguments. There should be one specifying conflict side,
+# others (e.g. path) will be forwarded to git commands.
+args=""
+while [ $# -gt 0 ]; do
+    arg="$1"; shift
+    case "$arg" in
+        --ours|--left) side="ours" ;;
+        --theirs|--right) side="theirs" ;;
+        **) args="$(echo $args $arg)" ;;  # echo -> trim extra whtespace
+    esac
+done
+
+if [ -z "$side" ]; then show_usage; fi
+
+explain_merge_conflict() {
+    if [ "$side" == "ours" ]; then
+        git log --patch -U5 --reverse MERGE_HEAD..HEAD $args
+    elif [ "$side" == "theirs" ]; then
+        git log --patch -U5 --reverse HEAD..MERGE_HEAD $args
+    fi
+}
+
+explain_rebase_conflict() {
+    if [ "$side" == "ours" ]; then
+        BASE_COMMIT="$(cat $(git rev-parse --git-dir)/rebase-merge/onto)"
+        git log --patch -U5 ORIG_HEAD..$BASE_COMMIT $args
+    elif [ "$side" == "theirs" ]; then
+        git show -U5 REBASE_HEAD $args
+    fi
+}
+
+if [ -e $(git rev-parse --git-dir)/MERGE_HEAD ]; then
+    explain_merge_conflict
+elif [ -e $(git rev-parse --git-dir)/REBASE_HEAD ]; then
+    explain_rebase_conflict
+fi

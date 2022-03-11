@@ -66,6 +66,8 @@ New commands and common aliases:
 - [`git submodule-details`](git-submodule-details) - see how current submodule
   status is related to what is recorded in the superproject (show relevant
   history graph).  Especially helpful when there are merge conflicts.
+- [`git explain-conflict`](git-explain-conflict) - display history of changes
+  that led to merge conflict.
 - Common aliases/shorthands, including [`co`, `br` and `st`](.gitconfig#L7)
 - Additional log aliases [`la`, `ll`, `lp`](.gitconfig#L30) to show more
   information from repo history.
