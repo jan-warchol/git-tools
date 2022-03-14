@@ -37,7 +37,7 @@ explain_rebase_conflict() {
         BASE_COMMIT="$(cat $(git rev-parse --git-dir)/rebase-merge/onto)"
         git log --patch -U5 ORIG_HEAD..$BASE_COMMIT $args
     elif [ "$side" == "theirs" ]; then
-        git show -U5 REBASE_HEAD $args
+        git log --patch -U5 -1 REBASE_HEAD $args
     fi
 }
 
