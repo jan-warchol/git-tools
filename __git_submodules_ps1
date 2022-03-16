@@ -27,18 +27,23 @@ function submodule_status() {
             [ $ahead_count -ne 0 ] && ahead="+${ahead_count}"
             [ -n "$behind$ahead" ] && separator=" "
 
-            __git_ps1 "${module}${separator}${ahead}${behind}: %s" | sed 's|remotes/||'
+            __git_ps1 "${module}${separator}${ahead}${behind}:%s " | sed 's|remotes/||'
         fi
         cd ..
     fi
 }
 
-if [ -e './.gitmodules' ]; then
-    echo -n "["
+function all_submodules_status() {
     # iterate over initialized submodules (handles whitespace in submodule paths)
     git submodule foreach 'echo $sm_path' | grep -v '^Entering' | while read -r module; do
         submodule_status "$module"
     done
+}
+
+if [ -e './.gitmodules' ]; then
+    echo -n "["
+    # wrap in echo to remove trailing whitespace from last submodule
+    echo -n $(all_submodules_status)
     echo -n "]"
 fi
 
