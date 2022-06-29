@@ -43,7 +43,7 @@ function all_submodules_status() {
 if [ -e './.gitmodules' ]; then
     echo -n "["
     # wrap in echo to remove trailing whitespace from last submodule
-    echo -n $(all_submodules_status)
+    echo -n "$(all_submodules_status)"
     echo -n "]"
 fi
 
