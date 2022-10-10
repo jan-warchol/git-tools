@@ -1,0 +1,98 @@
+#!/bin/bash
+
+usage="
+Usage: git hotfix-apply <target branches>
+
+Commits your changes and merges current branch into <target branches>.
+"
+[[ $# -lt 1 || $1 == "-h" ]] && echo "$usage" && exit 1
+
+# formatting etc.
+_strong="\033[1;97m"
+_reset="\033[0m"
+display_limit=10
+# fall back to "git log --oneline --graph" if "git pretty-log" is not present
+: "${LOG_CMD:=$(which git-pretty-log >/dev/null &&
+                echo 'pretty-log' ||
+                echo 'log --oneline --graph')}"
+
+# current branch (symbolic nme)
+hotfix_branch=$(git rev-parse --abbrev-ref 2>/dev/null HEAD)
+
+# sanity checks
+if [[ -e $(git rev-parse --git-dir)/MERGE_HEAD ]]; then
+    echo "There is a merge in progress. Commit the merge before continuing."
+    exit 1
+fi
+if [[ -e $(git rev-parse --git-dir)/REBASE_HEAD ]]; then
+    echo "There is a rebase in progress. Finish it before continuing."
+    exit 1
+fi
+for target in "$@"; do
+    if [[ $target == $hotfix_branch ]]; then
+        echo Error: current branch \"$hotfix_branch\" specified as the target.
+        echo Error: Either you are on the wrong branch or the target is wrong.
+        echo "$usage"
+        exit 1
+    fi
+done
+
+# ensure changes are committed
+if ! git diff HEAD --quiet; then
+    if ! git commit --verbose --all --edit --message "fix:"; then
+        exit 1
+    fi
+fi
+
+# preview targets
+echo -en "\n${_strong}$hotfix_branch${_reset} "
+echo "will be merged into the following branches:"
+for target in "$@"; do
+    if ! git rev-parse --verify $target &>/dev/null; then
+        echo Error: \"$target\" is not a valid branch.
+        echo "$usage"
+        exit 1
+    else
+        echo - $target
+    fi
+done
+
+# preview changes
+for target in "$@"; do
+    count=$(git rev-list --count $target..HEAD)
+    if [[ $count == 0 ]]; then
+        echo -e "\nBranch $target is up to date."
+        continue
+    fi
+    echo -en "\n$count commit(s) will be merged into "
+    echo -e "${_strong}$target${_reset} branch:"
+    git $LOG_CMD $target..HEAD -$display_limit
+    if [[ $count -gt $display_limit ]] ; then
+        echo "... skipping $(($count - $display_limit)) commit(s) ..."
+    fi
+    something_to_do=1
+done
+
+if [[ ! $something_to_do -eq 1 ]]; then exit 0; fi
+
+# let the user confirm after previewing targets and commits
+echo
+read -p "Continue? (y/n) " -n 1 -r
+echo
+if [[ $REPLY != "y" ]]; then
+    echo Aborting.
+    exit 1
+fi
+
+# actual merging
+for target in "$@"; do
+    echo -e "\n${_strong}Merging $hotfix_branch into $target...${_reset}"
+    git checkout --quiet $target
+    if ! git merge $hotfix_branch; then
+        echo -en "\n${_strong}After solving and committing conflicted merge, "
+        echo -e  "you may run git hotfix-apply again.${_reset}"
+        echo Be sure to checkout $hotfix_branch again before doing so.
+        exit 1
+    fi
+    git checkout --quiet $hotfix_branch
+done
