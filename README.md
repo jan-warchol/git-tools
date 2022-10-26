@@ -1,5 +1,5 @@
-Git ninja tools
-===============
+Git tools
+=========
 
 ![Screenshot of sensible-dotfiles](https://i.imgur.com/a4auwdx.png)
 
@@ -10,34 +10,23 @@ experience.
 Installation
 ------------
 
+### Automatic
+
 Clone the repo and run installation script:
 
 ```bash
-git clone https://github.com/jan-warchol/git-ninja-tools
-./git-ninja-tools/install.sh
+git clone https://github.com/jan-warchol/git-tools
+./git-tools/install.sh
 ```
 
-Manual installation:
+### Manual
+
 1. Clone this repo
 1. Add it to your PATH to make new git commands available
 1. Source `bash-completion.sh` in your bash configuration to enable
    autocompletion for new commands
 1. Import settings from `.gitconfig` into your git configuration file
-
-### Repository status in prompt
-
-Paste the following snippet to your `.bashrc` to use a simple and elegant
-prompt that displays status of your repo:
-
-```bash
-# Using \[ and \] is necessary to prevent weird behavior (lines overlapping).
-blue="\[\e[94m\]"
-cyan="\[\e[96m\]"
-reset="\[\e[0m\]"
-GIT_PS1_SHOWDIRTYSTATE=1
-GIT_PS1_SHOWUPSTREAM="verbose git"
-export PS1="${blue}\u ${cyan}\w${reset}\$(__git_ps1)\n\\$ "
-```
+1. Edit your `PS1` variable to include `\$(__git_ps1)`
 
 
 Features

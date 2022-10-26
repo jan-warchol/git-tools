@@ -26,5 +26,26 @@ if ! git config --get-all include.path | grep $REPO_PATH > /dev/null; then
 		EOF
 fi
 
+# ensure git prompt is enabled
+if [[ ! "$PS1" == *__git_ps1* ]]; then
+    echo "Enabling git repository status in prompt..."
+    cat >> $HOME/.bashrc <<- EOF
+		
+		# Git-enabled prompt from git-tools repo
+		#
+		# Note: using \[ and \] is necessary to prevent weird behavior (lines overlapping).
+		blue="\[\e[94m\]"
+		cyan="\[\e[96m\]"
+		reset="\[\e[0m\]"
+		# \$(__git_ps1) displays git repository status in the prompt - very handy!
+		# Read more: https://github.com/git/git/blob/master/contrib/completion/git-prompt.sh
+		GIT_PS1_SHOWDIRTYSTATE=1
+		GIT_PS1_SHOWUPSTREAM="verbose git"
+		# we don't want "command not found" errors in case __git_ps1 is not installed
+		type __git_ps1 &>/dev/null || function __git_ps1 () { true; }
+		export PS1="\${blue}\\u@\\h \${cyan}\\w\${reset}\\\$(__git_ps1)\\n\\\\\$ "
+		EOF
+fi
+
 echo -e "Installation complete."
-echo -e "${_strong}Reopen your terminal${_reset} to see effects."
+echo -e "${_strong}Reopen your terminal${_reset} to see the effects."
