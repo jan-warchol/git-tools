@@ -10,39 +10,54 @@ show_usage() {
 
 if [ $# -lt 2 ]; then show_usage; fi
 
-# Parse arguments. There should be one specifying conflict side,
-# others (e.g. path) will be forwarded to git commands.
-args=""
+# Parse arguments.
+# There should be one specifying conflict side and one specifying path.
 while [ $# -gt 0 ]; do
     arg="$1"; shift
     case "$arg" in
-        --ours|--left) side="ours" ;;
-        --theirs|--right) side="theirs" ;;
-        **) args="$(echo $args $arg)" ;;  # echo -> trim extra whtespace
+        --ours|--left)
+            side="ours" ;;
+        --theirs|--right)
+            side="theirs" ;;
+        **)
+            if [ -e "$arg" ]; then
+                fpath="$arg"
+            else
+                echo "unrecognized arg: $arg"; show_usage;
+            fi ;;
     esac
 done
 
 if [ -z "$side" ]; then show_usage; fi
+if [ ! -e "$fpath" ]; then show_usage; fi
 
-explain_merge_conflict() {
-    if [ "$side" == "ours" ]; then
-        git log --patch -U5 --reverse MERGE_HEAD..HEAD $args
-    elif [ "$side" == "theirs" ]; then
-        git log --patch -U5 --reverse HEAD..MERGE_HEAD $args
-    fi
-}
-
-explain_rebase_conflict() {
-    if [ "$side" == "ours" ]; then
-        BASE_COMMIT="$(cat $(git rev-parse --git-dir)/rebase-merge/onto)"
-        git log --patch -U5 ORIG_HEAD..$BASE_COMMIT $args
-    elif [ "$side" == "theirs" ]; then
-        git log --patch -U5 -1 REBASE_HEAD $args
-    fi
-}
+# Extract information about which lines to show from hunk headers.
+if [ "$side" == "ours" ]; then field="2"; else field="3"; fi
+conflicted_hunks=$(git diff $fpath |
+    grep "^@@@" |
+    cut -d ' ' -f $field |
+    cut -c 2- |
+    sed 's/,/,+/g'
+)
+for hunk in $conflicted_hunks; do
+    line_ranges="-L $hunk:$fpath $line_ranges"
+done
 
 if [ -e $(git rev-parse --git-dir)/MERGE_HEAD ]; then
-    explain_merge_conflict
+    # Conflicts appeared during merge.
+    if [ "$side" == "ours" ]; then
+        commit_range="MERGE_HEAD..HEAD"
+    elif [ "$side" == "theirs" ]; then
+        commit_range="HEAD..MERGE_HEAD"
+    fi
 elif [ -e $(git rev-parse --git-dir)/REBASE_HEAD ]; then
-    explain_rebase_conflict
+    # Conflicts appeared during rebase.
+    if [ "$side" == "ours" ]; then
+        BASE_COMMIT="$(cat $(git rev-parse --git-dir)/rebase-merge/onto)"
+        commit_range="ORIG_HEAD..$BASE_COMMIT"
+    elif [ "$side" == "theirs" ]; then
+        commit_range="REBASE_HEAD -1"
+    fi
 fi
+
+git log --patch -U5 --reverse $commit_range $line_ranges
